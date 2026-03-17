@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@layer base {
+  body {
+    background: #000000;
+    color: #FAD399;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* NO body::before gradient background */
+
+  #root {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+}
+
+@layer components {
+  .glass {
+    background: transparent;
+    border: 1px solid #222;
+    border-radius: 2px;
+  }
+
+  .glass-card {
+    background: transparent;
+    border: 1px solid #222;
+    border-radius: 2px;
+    padding: 1rem;
+  }
+
+  .glass-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #333;
+    border-radius: 0;
+    padding: 0.75rem 0;
+    color: #FAD399;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .glass-input::placeholder {
+    color: #555;
+  }
+
+  .glass-input:focus {
+    border-bottom-color: #FAD399;
+  }
+
+  .glass-input:disabled {
+    opacity: 0.3;
+  }
+
+  .glass-button {
+    background: transparent;
+    border: 1px solid #555;
+    border-radius: 2px;
+    padding: 0.6rem 1.25rem;
+    color: #FAD399;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.1s;
+    letter-spacing: 0.02em;
+  }
+
+  .glass-button:hover {
+    background: #FAD399;
+    color: #000;
+    border-color: #FAD399;
+  }
+
+  .glass-button:active {
+    transform: scale(0.98);
+  }
+
+  .glass-button-primary {
+    background: #FAD399;
+    border: 1px solid #FAD399;
+    border-radius: 2px;
+    padding: 0.6rem 1.25rem;
+    color: #000;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.1s;
+    letter-spacing: 0.02em;
+  }
+
+  .glass-button-primary:hover {
+    background: #fff;
+  }
+
+  .glass-button-primary:active {
+    transform: scale(0.98);
+  }
+
+  .glass-button-primary:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .glass-nav {
+    background: rgba(0, 0, 0, 0.95);
+    border-top: 1px solid #222;
+  }
+}
+
+/* Wheel - subtle, no glow */
+.mahoraga-wheel {
+  /* no animation - brutalist = static */
+}
+
+/* Node subtle pulse - keep but make it barely noticeable */
+@keyframes nodePulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
+}
+
+.wheel-node {
+  animation: nodePulse 3s ease-in-out infinite;
+}
+
+/* Typing indicator for AI chat */
+@keyframes typingDot {
+  0%, 80%, 100% { opacity: 0.2; }
+  40% { opacity: 0.8; }
+}
+
+.typing-dot {
+  animation: typingDot 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Check animation - minimal */
+@keyframes checkPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.check-pop {
+  animation: checkPop 0.15s ease-out;
+}
+
+/* Progress bar */
+.progress-fill {
+  transition: width 0.3s ease-out;
+}
+
+/* Current block - subtle border pulse */
+@keyframes blockPulse {
+  0%, 100% { border-left-color: #333; }
+  50% { border-left-color: #888; }
+}
+
+.current-block {
+  animation: blockPulse 2s ease-in-out infinite;
+}
+
+/* Scrollbar - barely visible */
+::-webkit-scrollbar {
+  width: 2px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #222;
+}
+
+/* Safe area */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .glass-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Monospace utility */
+.font-mono {
+  font-family: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+}
