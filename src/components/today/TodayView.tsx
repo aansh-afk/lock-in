@@ -3,6 +3,7 @@ import { api } from "../../../convex/_generated/api";
 import { useState, useEffect, useMemo } from "react";
 import {
   SCHEDULE,
+  HOLIDAY_SCHEDULE,
   getCurrentBlock,
   MEALS,
   type ScheduleBlock,
@@ -280,9 +281,9 @@ function MacroBar({
   );
 }
 
-function ScheduleTimeline({ currentBlock }: { currentBlock: ScheduleBlock | null }) {
+function ScheduleTimeline({ currentBlock, schedule }: { currentBlock: ScheduleBlock | null; schedule: ScheduleBlock[] }) {
   // Filter out the sleep block to keep the timeline compact
-  const timelineBlocks = SCHEDULE.filter((b) => b.category !== "sleep");
+  const timelineBlocks = schedule.filter((b) => b.category !== "sleep");
 
   return (
     <div className="space-y-0">
@@ -336,23 +337,65 @@ function ScheduleTimeline({ currentBlock }: { currentBlock: ScheduleBlock | null
 // Main Component
 // ---------------------------------------------------------------------------
 
+function getHolidayKey(): string {
+  return `wheel_holiday_${new Date().toISOString().split("T")[0]}`;
+}
+
 export function TodayView() {
   const { userId } = useAuth();
   const dailyChecks = useQuery(api.daily.listToday, userId ? { userId } : "skip");
   const toggleCheck = useMutation(api.daily.toggle);
   const { trigger } = useWebHaptics();
 
+  const [isHoliday, setIsHoliday] = useState(() => {
+    return localStorage.getItem(getHolidayKey()) === "true";
+  });
+
+  const activeSchedule = isHoliday ? HOLIDAY_SCHEDULE : SCHEDULE;
+
+  const toggleHoliday = () => {
+    const next = !isHoliday;
+    setIsHoliday(next);
+    if (next) {
+      localStorage.setItem(getHolidayKey(), "true");
+    } else {
+      localStorage.removeItem(getHolidayKey());
+    }
+    trigger("nudge");
+  };
+
   const [currentBlock, setCurrentBlock] = useState<ScheduleBlock | null>(
     getCurrentBlock(new Date())
   );
 
-  // Re-evaluate current block every minute
+  // Re-evaluate current block every minute using active schedule
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentBlock(getCurrentBlock(new Date()));
-    }, 60_000);
+    const evalBlock = () => {
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      for (const block of activeSchedule) {
+        const [sh, sm] = block.start.split(":").map(Number);
+        const [eh, em] = block.end.split(":").map(Number);
+        const start = sh * 60 + sm;
+        const end = eh * 60 + em;
+        if (end > start) {
+          if (currentMinutes >= start && currentMinutes < end) {
+            setCurrentBlock(block);
+            return;
+          }
+        } else {
+          if (currentMinutes >= start || currentMinutes < end) {
+            setCurrentBlock(block);
+            return;
+          }
+        }
+      }
+      setCurrentBlock(null);
+    };
+    evalBlock();
+    const interval = setInterval(evalBlock, 60_000);
     return () => clearInterval(interval);
-  }, []);
+  }, [activeSchedule]);
 
   // Build a set of completed check types for fast lookup
   const completedSet = useMemo(() => {
@@ -391,11 +434,23 @@ export function TodayView() {
   return (
     <div className="max-w-lg mx-auto px-4 pt-8 pb-24">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">TODAY</h1>
-        <p className="text-white/40 text-sm mt-0.5">
-          {getDateString()} &middot; {getGreeting()}
-        </p>
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">TODAY</h1>
+          <p className="text-white/40 text-sm mt-0.5">
+            {getDateString()} &middot; {getGreeting()}
+          </p>
+        </div>
+        <button
+          onClick={toggleHoliday}
+          className={`text-xs font-mono px-3 py-1.5 rounded border transition-all ${
+            isHoliday
+              ? "bg-[#FAD399] text-black border-[#FAD399] font-bold"
+              : "bg-transparent text-[#555] border-[#333] hover:border-[#555]"
+          }`}
+        >
+          {isHoliday ? "HOLIDAY" : "Holiday?"}
+        </button>
       </div>
 
       {/* Current Block Indicator */}
@@ -450,7 +505,7 @@ export function TodayView() {
         <h2 className="text-white/50 text-xs uppercase tracking-wider font-medium mb-3">
           Schedule
         </h2>
-        <ScheduleTimeline currentBlock={currentBlock} />
+        <ScheduleTimeline currentBlock={currentBlock} schedule={activeSchedule} />
       </div>
     </div>
   );

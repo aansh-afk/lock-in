@@ -541,8 +541,17 @@ export const STUDY_MODULES: StudyModule[] = [
 /** Day 1 of the lock-in */
 export const START_DATE = new Date("2026-03-15T00:00:00");
 
-/** Exam target date */
+/** M8/M9 on-demand exam target */
+export const MAY_EXAM_DATE = new Date("2026-05-15T00:00:00");
+
+/** M3/M4/M5/M10 exam target date */
 export const EXAM_DATE = new Date("2026-06-15T00:00:00");
+
+/** Days until M8/M9 May exam */
+export function getDaysUntilMayExam(date: Date): number {
+  const diff = MAY_EXAM_DATE.getTime() - date.getTime();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
 
 /** How many days since the lock-in started (0-indexed, day 1 = 0) */
 export function getDayNumber(date: Date): number {
@@ -577,6 +586,171 @@ export const NON_NEGOTIABLES: string[] = [
   "Study every available minute - commute, class, lunch",
   "SaaS gets 2 hours daily - no more, no less",
   "Sleep by 00:30 - 7 hours minimum",
+];
+
+// ---------------------------------------------------------------------------
+// M8/M9 Retake Study Plan (May on-demand exam)
+// ---------------------------------------------------------------------------
+
+export type ExamModule = {
+  number: number;
+  name: string;
+  topics: Array<{ section: string; subtopics: string[] }>;
+};
+
+export const RETAKE_MODULES: ExamModule[] = [
+  {
+    number: 8,
+    name: "Basic Aerodynamics",
+    topics: [
+      {
+        section: "Physics of the Atmosphere",
+        subtopics: ["ISA", "Pressure", "Temperature", "Density", "Altitude"],
+      },
+      {
+        section: "Aerodynamics",
+        subtopics: [
+          "Airflow around a body",
+          "Boundary layer",
+          "Drag (parasite, induced, total)",
+          "Lift (Bernoulli, Newton)",
+          "Lift/drag ratio",
+          "Aerofoil contamination (ice, frost)",
+        ],
+      },
+      {
+        section: "Theory of Flight",
+        subtopics: [
+          "Relationship between lift, weight, thrust, drag",
+          "Glide ratio",
+          "Steady-state flights",
+          "Load factor in turns",
+          "Stalling",
+        ],
+      },
+      {
+        section: "Flight Stability and Dynamics",
+        subtopics: [
+          "Longitudinal, lateral, directional stability",
+          "Static and dynamic stability",
+        ],
+      },
+    ],
+  },
+  {
+    number: 9,
+    name: "Human Factors",
+    topics: [
+      {
+        section: "General",
+        subtopics: [
+          "Human error models (SHELL, Reason)",
+          "Murphy's law",
+          "Error types & error chains",
+        ],
+      },
+      {
+        section: "Human Performance & Limitations",
+        subtopics: [
+          "Vision and visual limitations",
+          "Hearing and noise",
+          "Information processing",
+          "Attention and perception",
+          "Memory (sensory, short-term, long-term)",
+          "Claustrophobia and physical access",
+        ],
+      },
+      {
+        section: "Social Psychology",
+        subtopics: [
+          "Responsibility - individual and group",
+          "Motivation and demotivation",
+          "Peer pressure",
+          "Teamwork and team management",
+        ],
+      },
+      {
+        section: "Factors Affecting Performance",
+        subtopics: [
+          "Fitness/health",
+          "Stress (domestic/work)",
+          "Time pressure and deadlines",
+          "Workload (overload/underload)",
+          "Sleep and fatigue",
+          "Alcohol, medication, drugs",
+          "Shift work",
+        ],
+      },
+      {
+        section: "Physical Environment",
+        subtopics: [
+          "Noise and fumes",
+          "Illumination",
+          "Climate and temperature",
+          "Workplace design/ergonomics",
+        ],
+      },
+      {
+        section: "Tasks & Communication",
+        subtopics: [
+          "Visual inspection and visual aids",
+          "Repetitive tasks",
+          "Communication within and between teams",
+          "Logging and recording",
+          "Keeping up to date (currency)",
+        ],
+      },
+      {
+        section: "Human Error in Maintenance",
+        subtopics: [
+          "Error models specific to aviation maintenance",
+          "Implications of errors",
+          "Avoiding and managing errors (dirty dozen)",
+        ],
+      },
+    ],
+  },
+];
+
+/** 8-week study phases for M8/M9 retake */
+export const RETAKE_PHASES = [
+  { weeks: "1-2", label: "Gap Finding", activity: "Practice papers for both modules, identify weak topics" },
+  { weeks: "3-4", label: "Deep Dive", activity: "Target weak sections, reread + handwrite notes" },
+  { weeks: "5-6", label: "Drill", activity: "Timed practice papers, mixed questions" },
+  { weeks: "7-8", label: "Lock In", activity: "Full mock exams, review all mistakes" },
+] as const;
+
+/** Returns current retake phase based on weeks since start */
+export function getRetakePhase(date: Date): typeof RETAKE_PHASES[number] {
+  const weeksSinceStart = Math.floor(getDayNumber(date) / 7);
+  if (weeksSinceStart < 2) return RETAKE_PHASES[0];
+  if (weeksSinceStart < 4) return RETAKE_PHASES[1];
+  if (weeksSinceStart < 6) return RETAKE_PHASES[2];
+  return RETAKE_PHASES[3];
+}
+
+// ---------------------------------------------------------------------------
+// Holiday Schedule (replaces weekday schedule on holidays)
+// ---------------------------------------------------------------------------
+
+export const HOLIDAY_SCHEDULE: ScheduleBlock[] = [
+  { start: "07:30", end: "08:00", label: "WAKE", activity: "Wake up, get ready, whey + banana", category: "wake" },
+  { start: "08:00", end: "10:00", label: "M8 STUDY", activity: "Module 8 - Aerodynamics deep study", category: "study" },
+  { start: "10:00", end: "10:15", label: "BREAK", activity: "Short break", category: "break" },
+  { start: "10:15", end: "12:15", label: "M9 STUDY", activity: "Module 9 - Human Factors deep study", category: "study" },
+  { start: "12:15", end: "13:00", label: "LUNCH", activity: "Eat prepped meal", category: "lunch" },
+  { start: "13:00", end: "14:30", label: "MAIN STUDY", activity: "Current month module (M3/M4/M5/M10)", category: "study" },
+  { start: "14:30", end: "14:45", label: "BREAK", activity: "Short break", category: "break" },
+  { start: "14:45", end: "16:15", label: "PRACTICE", activity: "M8/M9 practice papers & questions", category: "study" },
+  { start: "16:15", end: "17:00", label: "REVIEW", activity: "Review mistakes from practice papers", category: "study" },
+  { start: "17:30", end: "18:30", label: "FOUNDER", activity: "Call with co-founder (hard cap at 1 hour)", category: "founder" },
+  { start: "18:30", end: "19:30", label: "SAAS", activity: "SaaS development - hour 1", category: "saas" },
+  { start: "19:30", end: "22:15", label: "GYM", activity: "Travel (15 min) + Workout (1 hr) + Cardio (30 min) + Travel (15 min)", category: "gym" },
+  { start: "22:15", end: "22:30", label: "COOK", activity: "Prep dinner + tomorrow's lunch (15 min)", category: "cook" },
+  { start: "22:30", end: "23:00", label: "DINNER", activity: "Eat", category: "dinner" },
+  { start: "23:00", end: "00:00", label: "SAAS", activity: "SaaS development - hour 2", category: "saas" },
+  { start: "00:00", end: "00:30", label: "WIND DOWN", activity: "No phone. Podcast on, phone face down. Lights off.", category: "wind-down" },
+  { start: "00:30", end: "07:30", label: "SLEEP", activity: "7 hours until 07:30", category: "sleep" },
 ];
 
 // ---------------------------------------------------------------------------
