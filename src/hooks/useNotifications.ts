@@ -5,6 +5,16 @@ import { useAuth } from "../lib/auth";
 import { SCHEDULE } from "../lib/constants";
 
 // ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Convert "HH:MM" to minutes since midnight */
+function timeToMinutes(time: string): number {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
+}
+
+// ---------------------------------------------------------------------------
 // Browser notification permission + scheduled reminders
 // ---------------------------------------------------------------------------
 
@@ -20,14 +30,19 @@ export function useNotifications() {
   const firedBlocks = useRef<Set<string>>(new Set());
   const permissionRef = useRef<NotificationPermission>("default");
 
-  // ----- Request permission on mount -----
+  // ----- Request permission after a short delay on mount -----
   useEffect(() => {
     if (!("Notification" in window)) return;
 
     if (Notification.permission === "default") {
-      Notification.requestPermission().then((perm) => {
-        permissionRef.current = perm;
-      });
+      // Delay the permission request slightly -- some browsers block
+      // immediate permission requests fired during page load.
+      const timer = setTimeout(() => {
+        Notification.requestPermission().then((perm) => {
+          permissionRef.current = perm;
+        });
+      }, 2000);
+      return () => clearTimeout(timer);
     } else {
       permissionRef.current = Notification.permission;
     }
@@ -63,16 +78,24 @@ export function useNotifications() {
     markAllRead({ userId });
   }, [unread, notify, markAllRead, userId]);
 
-  // ----- Schedule block reminders (check every minute) -----
+  // ----- Schedule block reminders -----
+  // Instead of matching exact HH:MM strings, we track which blocks have
+  // already been notified and fire for any block whose start time has
+  // passed but hasn't been notified yet (within a 2-minute window).
+  // This makes notifications resilient to throttled/backgrounded timers.
   useEffect(() => {
     const check = () => {
       const now = new Date();
-      const hh = now.getHours().toString().padStart(2, "0");
-      const mm = now.getMinutes().toString().padStart(2, "0");
-      const timeStr = `${hh}:${mm}`;
+      const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
       for (const block of SCHEDULE) {
-        if (block.start === timeStr && !firedBlocks.current.has(block.start)) {
+        if (firedBlocks.current.has(block.start)) continue;
+
+        const blockMinutes = timeToMinutes(block.start);
+        const elapsed = nowMinutes - blockMinutes;
+
+        // Fire if we're within 0-2 minutes past the block start
+        if (elapsed >= 0 && elapsed <= 2) {
           firedBlocks.current.add(block.start);
           notify(block.label, block.activity);
         }
@@ -80,7 +103,8 @@ export function useNotifications() {
     };
 
     check();
-    const interval = setInterval(check, 60_000);
+    // Check every 30 seconds for better reliability
+    const interval = setInterval(check, 30_000);
     return () => clearInterval(interval);
   }, [notify]);
 

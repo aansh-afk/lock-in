@@ -16,10 +16,9 @@ import { useAuth } from "../../lib/auth";
 // ---------------------------------------------------------------------------
 
 const MUSCLE_GROUPS: Record<string, string> = {
-  push: "Chest, Shoulders, Triceps",
-  pull: "Back, Biceps",
-  legs: "Quads, Hamstrings, Calves",
-  rest: "Recovery. The wheel rests.",
+  upper: "Chest, Back, Shoulders, Arms",
+  lower: "Quads, Hamstrings, Glutes, Calves, Core",
+  rest: "Recovery",
 };
 
 // ---------------------------------------------------------------------------
@@ -211,7 +210,7 @@ function RestDayView() {
           </div>
           <div className="flex items-start gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-[#555] mt-1.5 shrink-0" />
-            <p className="text-white/60 text-sm">Prep rice for the week</p>
+            <p className="text-white/60 text-sm">Prep roti dough for the week</p>
           </div>
           <div className="flex items-start gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-[#555] mt-1.5 shrink-0" />
@@ -232,11 +231,32 @@ export function TrainView() {
   const toggleCheck = useMutation(api.daily.toggle);
   const { trigger } = useWebHaptics();
 
+  const todayISO = getTodayDateISO();
+  const trainKey = `wheel_train_${todayISO}`;
+  const cardioKey = `wheel_cardio_${todayISO}`;
+
   const [workout] = useState<WorkoutDay>(() => getTodayWorkout(new Date()));
   const [completedExercises, setCompletedExercises] = useState<Set<number>>(
-    () => new Set()
+    () => {
+      try {
+        const stored = localStorage.getItem(trainKey);
+        if (stored) {
+          const indices: number[] = JSON.parse(stored);
+          return new Set(indices);
+        }
+      } catch {
+        // ignore corrupt data
+      }
+      return new Set();
+    }
   );
-  const [cardioComplete, setCardioComplete] = useState(false);
+  const [cardioComplete, setCardioComplete] = useState(() => {
+    try {
+      return localStorage.getItem(cardioKey) === "true";
+    } catch {
+      return false;
+    }
+  });
   const [workoutToggled, setWorkoutToggled] = useState(false);
   const [cardioToggled, setCardioToggled] = useState(false);
 
@@ -272,16 +292,30 @@ export function TrainView() {
         } else {
           next.add(index);
         }
+        // Persist to localStorage immediately
+        try {
+          localStorage.setItem(trainKey, JSON.stringify([...next]));
+        } catch {
+          // storage full or unavailable
+        }
         return next;
       });
     },
-    [trigger]
+    [trigger, trainKey]
   );
 
   const handleCardioToggle = useCallback(() => {
     trigger("success");
-    setCardioComplete((prev) => !prev);
-  }, [trigger]);
+    setCardioComplete((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(cardioKey, String(next));
+      } catch {
+        // storage full or unavailable
+      }
+      return next;
+    });
+  }, [trigger, cardioKey]);
 
   return (
     <div className="max-w-lg mx-auto px-4 pt-8 pb-24">
@@ -293,7 +327,9 @@ export function TrainView() {
             className={isRestDay ? "text-white/20" : "text-white"}
           />
           <h1 className="text-2xl font-bold tracking-tight uppercase">
-            {workout.type === "rest" ? "Rest Day" : `${workout.label} Day`}
+            {workout.type === "rest"
+              ? "Rest Day"
+              : `${workout.type === "upper" ? "Upper" : "Lower"} Day`}
           </h1>
         </div>
         <p className="text-white/40 text-sm">{MUSCLE_GROUPS[workout.type]}</p>

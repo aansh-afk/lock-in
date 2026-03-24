@@ -49,7 +49,7 @@ export type Exercise = {
 };
 
 export type WorkoutDay = {
-  type: "push" | "pull" | "legs" | "rest";
+  type: "upper" | "lower" | "rest";
   label: string;
   exercises: Exercise[];
 };
@@ -204,49 +204,51 @@ export const MEALS: Meal[] = [
     items: [
       { item: "Whey protein", amount: "1 scoop (30g)", protein: 25, calories: 120 },
       { item: "Banana", amount: "1 medium", protein: 1, calories: 105 },
+      { item: "Whole milk", amount: "300ml", protein: 10, calories: 200 },
     ],
-    totalProtein: 26,
-    totalCalories: 225,
+    totalProtein: 36,
+    totalCalories: 425,
   },
   {
     name: "Lunch",
     time: "13:15",
     items: [
       { item: "Chicken breast", amount: "200g", protein: 46, calories: 220 },
-      { item: "Rice", amount: "150g cooked", protein: 4, calories: 195 },
+      { item: "Roti", amount: "2 pieces (60g atta)", protein: 6, calories: 200 },
       { item: "Vegetables", amount: "100g", protein: 3, calories: 35 },
     ],
-    totalProtein: 53,
-    totalCalories: 450,
+    totalProtein: 55,
+    totalCalories: 455,
   },
   {
     name: "Post-Gym Shake",
     time: "22:00",
     items: [
       { item: "Whey protein", amount: "1 scoop (30g)", protein: 25, calories: 120 },
+      { item: "Whole milk", amount: "300ml", protein: 10, calories: 200 },
     ],
-    totalProtein: 25,
-    totalCalories: 120,
+    totalProtein: 35,
+    totalCalories: 320,
   },
   {
     name: "Dinner",
     time: "22:30",
     items: [
       { item: "Chicken breast", amount: "200g", protein: 46, calories: 220 },
+      { item: "Roti", amount: "2 pieces (60g atta)", protein: 6, calories: 200 },
       { item: "Whole eggs", amount: "2", protein: 12, calories: 140 },
-      { item: "Rice", amount: "150g cooked", protein: 4, calories: 195 },
       { item: "Vegetables", amount: "100g", protein: 3, calories: 35 },
     ],
-    totalProtein: 65,
-    totalCalories: 590,
+    totalProtein: 67,
+    totalCalories: 595,
   },
 ];
 
 export const DAILY_TARGETS = {
-  calories: 2250,
-  protein: 169,
-  carbs: 130,
-  fat: 35,
+  calories: 1850,
+  protein: 150,
+  carbs: 160,
+  fat: 45,
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -284,24 +286,27 @@ export const RECIPES: Recipe[] = [
     ],
   },
   {
-    name: "Rice (150g cooked)",
-    prep: "2 min prep, 15 min cook",
+    name: "Roti (2 pieces)",
+    prep: "10 min",
     steps: [
-      "Rinse 75g dry rice until water runs clear",
-      "Add to pot with 150ml water",
-      "Bring to boil, then lowest heat, lid on",
-      "Cook 12 min, don't open lid",
-      "Turn off heat, let sit 3 min, then fluff with fork",
+      "Knead 60g whole wheat atta with water until smooth",
+      "Divide into 2 balls",
+      "Roll each into thin circle on floured surface",
+      "Heat tawa/pan on high until very hot",
+      "Place roti, wait 30s until bubbles appear",
+      "Flip, press gently with cloth until it puffs",
+      "Remove when both sides have brown spots",
     ],
   },
   {
-    name: "Bulk Rice (3 days)",
-    prep: "2 min prep, 15 min cook",
+    name: "Bulk Roti Dough (Week)",
+    prep: "15 min",
     steps: [
-      "Rinse 300g dry rice",
-      "Cook with 600ml water same method",
-      "Cool completely before storing in fridge",
-      "Reheat portions in microwave 1.5 min",
+      "Mix 500g whole wheat atta with ~250ml water and pinch of salt",
+      "Knead for 5-8 minutes until smooth and elastic",
+      "Cover with damp cloth",
+      "Store in fridge (lasts 3-4 days)",
+      "Pull out portions as needed, roll and cook fresh",
     ],
   },
   {
@@ -340,49 +345,41 @@ export const RECIPES: Recipe[] = [
     prep: "15 min total",
     steps: [
       "Take prepped chicken from fridge",
-      "Heat rice in microwave 1.5 min",
+      "Make 2 rotis fresh (or from prepped dough)",
       "Heat or cook vegetables 3 min",
       "Cook 2 eggs (scrambled or fried)",
       "Plate everything. Eat.",
-      "Pack tomorrow's lunch: chicken + rice + veg in container",
+      "Pack tomorrow's lunch: chicken + 2 rotis + veg in container",
     ],
   },
 ];
 
 // ---------------------------------------------------------------------------
-// Gym - PPL 6-day split
+// Gym - Upper/Lower split
 // ---------------------------------------------------------------------------
 
-const PUSH_EXERCISES: Exercise[] = [
-  { name: "Barbell Bench Press", sets: 4, reps: 8, notes: "Compound. Go heavy." },
-  { name: "Dumbbell Shoulder Press", sets: 3, reps: 10, notes: "Controlled. Full range." },
-  { name: "Incline Dumbbell Press", sets: 3, reps: 10, notes: "30-45 degree incline." },
-  { name: "Cable/Machine Lateral Raises", sets: 3, reps: 15, notes: "Light weight, feel the burn." },
-  { name: "Tricep Pushdowns", sets: 3, reps: 12, notes: "Cable or machine." },
-  { name: "Overhead Tricep Extension", sets: 3, reps: 12, notes: "Dumbbell or cable." },
+const UPPER_EXERCISES: Exercise[] = [
+  { name: "Barbell Bench Press", sets: 3, reps: 8, notes: "Start light, nail form first" },
+  { name: "Dumbbell Rows", sets: 3, reps: 10, notes: "One arm at a time. Squeeze at top." },
+  { name: "Overhead Press (DB or Barbell)", sets: 3, reps: 10, notes: "Seated or standing. Full range." },
+  { name: "Lat Pulldown", sets: 3, reps: 10, notes: "Wide grip. Feel the stretch." },
+  { name: "Lateral Raises", sets: 3, reps: 15, notes: "Light weight. Control the negative." },
+  { name: "Tricep Pushdowns", sets: 2, reps: 12, notes: "Cable. Lock elbows in place." },
+  { name: "Bicep Curls", sets: 2, reps: 12, notes: "Dumbbells. No swinging." },
 ];
 
-const PULL_EXERCISES: Exercise[] = [
-  { name: "Barbell Rows", sets: 4, reps: 8, notes: "Compound. Go heavy." },
-  { name: "Lat Pulldown", sets: 3, reps: 10, notes: "Wide grip. Full stretch." },
-  { name: "Cable/Machine Rows", sets: 3, reps: 10, notes: "Squeeze at the top." },
-  { name: "Face Pulls", sets: 3, reps: 15, notes: "Light. Rear delts and posture." },
-  { name: "Barbell Curls", sets: 3, reps: 10, notes: "No swinging. Strict form." },
-  { name: "Hammer Curls", sets: 3, reps: 12, notes: "Dumbbells. Forearms too." },
-];
-
-const LEGS_EXERCISES: Exercise[] = [
-  { name: "Barbell Squats", sets: 4, reps: 8, notes: "Compound. Go heavy. Depth matters." },
-  { name: "Romanian Deadlifts", sets: 3, reps: 10, notes: "Feel the hamstring stretch." },
+const LOWER_EXERCISES: Exercise[] = [
+  { name: "Goblet Squats", sets: 3, reps: 10, notes: "Hold dumbbell at chest. Full depth." },
+  { name: "Romanian Deadlifts", sets: 3, reps: 10, notes: "Dumbbells or barbell. Feel hamstrings." },
   { name: "Leg Press", sets: 3, reps: 10, notes: "Feet shoulder width. Full range." },
-  { name: "Leg Curls", sets: 3, reps: 12, notes: "Machine. Controlled." },
-  { name: "Calf Raises", sets: 4, reps: 15, notes: "Pause at the top. Full stretch at bottom." },
+  { name: "Leg Curls", sets: 3, reps: 12, notes: "Machine. Slow negative." },
+  { name: "Calf Raises", sets: 3, reps: 15, notes: "Pause at top. Full stretch bottom." },
+  { name: "Plank", sets: 3, reps: 30, notes: "Hold 30s. Core tight. Don't sag." },
 ];
 
-export const WORKOUTS: Record<"push" | "pull" | "legs" | "rest", WorkoutDay> = {
-  push: { type: "push", label: "Push", exercises: PUSH_EXERCISES },
-  pull: { type: "pull", label: "Pull", exercises: PULL_EXERCISES },
-  legs: { type: "legs", label: "Legs", exercises: LEGS_EXERCISES },
+export const WORKOUTS: Record<"upper" | "lower" | "rest", WorkoutDay> = {
+  upper: { type: "upper", label: "Upper", exercises: UPPER_EXERCISES },
+  lower: { type: "lower", label: "Lower", exercises: LOWER_EXERCISES },
   rest: { type: "rest", label: "Rest Day", exercises: [] },
 };
 
@@ -394,14 +391,14 @@ export const CARDIO = {
 } as const;
 
 /** Maps day-of-week (0=Sun .. 6=Sat) to workout type */
-export const PPL_CYCLE: Array<"push" | "pull" | "legs" | "rest"> = [
-  "rest",  // Sunday
-  "push",  // Monday
-  "pull",  // Tuesday
-  "legs",  // Wednesday
-  "push",  // Thursday
-  "pull",  // Friday
-  "legs",  // Saturday
+export const WORKOUT_CYCLE: Array<"upper" | "lower" | "rest"> = [
+  "rest",   // Sunday
+  "upper",  // Monday
+  "lower",  // Tuesday
+  "rest",   // Wednesday
+  "upper",  // Thursday
+  "lower",  // Friday
+  "rest",   // Saturday
 ];
 
 // ---------------------------------------------------------------------------
@@ -582,7 +579,7 @@ export function getAllDaysSinceStart(date: Date): string[] {
 
 export const NON_NEGOTIABLES: string[] = [
   "Hit every meal - no skipping, no junk",
-  "Train 6 days a week - PPL, no excuses",
+  "Train 4 days a week - Upper/Lower, no excuses",
   "Study every available minute - commute, class, lunch",
   "SaaS gets 2 hours daily - no more, no less",
   "Sleep by 00:30 - 7 hours minimum",
@@ -795,11 +792,11 @@ export function getCurrentBlock(date: Date): ScheduleBlock | null {
 }
 
 /**
- * Returns today's workout based on day of week mapped to the PPL cycle.
+ * Returns today's workout based on day of week mapped to the Upper/Lower cycle.
  */
 export function getTodayWorkout(date: Date): WorkoutDay {
   const dayOfWeek = date.getDay(); // 0=Sun .. 6=Sat
-  const workoutType = PPL_CYCLE[dayOfWeek];
+  const workoutType = WORKOUT_CYCLE[dayOfWeek];
   return WORKOUTS[workoutType];
 }
 

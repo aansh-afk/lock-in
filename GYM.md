@@ -1,10 +1,10 @@
-# Gym Program - PPL 6 Day Split
+# Gym Program - Upper/Lower 4 Day Split
 
 ## Goal
 
-- Body recomp: Lose fat, build muscle
-- Target: 12-13% body fat by June 2026
-- Training: 6 days on, 1 day off (Sunday rest)
+- Cut: Get lean while preserving muscle
+- Current: 71kg, 5'7"
+- Training: 4 days on, 3 days off
 
 ---
 
@@ -12,51 +12,40 @@
 
 | Day | Focus |
 |-----|-------|
-| Monday | Push (Chest, Shoulders, Triceps) |
-| Tuesday | Pull (Back, Biceps) |
-| Wednesday | Legs |
-| Thursday | Push |
-| Friday | Pull |
-| Saturday | Legs |
+| Monday | Upper (Chest, Back, Shoulders, Arms) |
+| Tuesday | Lower (Quads, Hamstrings, Glutes, Core) |
+| Wednesday | REST |
+| Thursday | Upper |
+| Friday | Lower |
+| Saturday | REST |
 | Sunday | REST |
 
 ---
 
-## Day 1 & 4 - Push
+## Upper Day (Monday & Thursday)
 
 | Exercise | Sets x Reps | Notes |
 |----------|-------------|-------|
-| Barbell Bench Press | 4x8 | Compound. Go heavy. |
-| Dumbbell Shoulder Press | 3x10 | Controlled. Full range. |
-| Incline Dumbbell Press | 3x10 | 30-45 degree incline. |
-| Cable/Machine Lateral Raises | 3x15 | Light weight, feel the burn. |
-| Tricep Pushdowns | 3x12 | Cable or machine. |
-| Overhead Tricep Extension | 3x12 | Dumbbell or cable. |
+| Barbell Bench Press | 3x8 | Start light, nail form first |
+| Dumbbell Rows | 3x10 | One arm at a time. Squeeze at top. |
+| Overhead Press (DB or Barbell) | 3x10 | Seated or standing. Full range. |
+| Lat Pulldown | 3x10 | Wide grip. Feel the stretch. |
+| Lateral Raises | 3x15 | Light weight. Control the negative. |
+| Tricep Pushdowns | 2x12 | Cable. Lock elbows in place. |
+| Bicep Curls | 2x12 | Dumbbells. No swinging. |
 
 ---
 
-## Day 2 & 5 - Pull
+## Lower Day (Tuesday & Friday)
 
 | Exercise | Sets x Reps | Notes |
 |----------|-------------|-------|
-| Barbell Rows | 4x8 | Compound. Go heavy. |
-| Lat Pulldown | 3x10 | Wide grip. Full stretch. |
-| Cable/Machine Rows | 3x10 | Squeeze at the top. |
-| Face Pulls | 3x15 | Light. Rear delts and posture. |
-| Barbell Curls | 3x10 | No swinging. Strict form. |
-| Hammer Curls | 3x12 | Dumbbells. Forearms too. |
-
----
-
-## Day 3 & 6 - Legs
-
-| Exercise | Sets x Reps | Notes |
-|----------|-------------|-------|
-| Barbell Squats | 4x8 | Compound. Go heavy. Depth matters. |
-| Romanian Deadlifts | 3x10 | Feel the hamstring stretch. |
+| Goblet Squats | 3x10 | Hold dumbbell at chest. Full depth. |
+| Romanian Deadlifts | 3x10 | Dumbbells or barbell. Feel hamstrings. |
 | Leg Press | 3x10 | Feet shoulder width. Full range. |
-| Leg Curls | 3x12 | Machine. Controlled. |
-| Calf Raises | 4x15 | Pause at the top. Full stretch at bottom. |
+| Leg Curls | 3x12 | Machine. Slow negative. |
+| Calf Raises | 3x15 | Pause at top. Full stretch bottom. |
+| Plank | 3x30s | Hold. Core tight. Don't sag. |
 
 ---
 
@@ -66,32 +55,32 @@ After every lifting session:
 - **Incline treadmill walk** - 30 minutes
 - **Incline**: 10-15%
 - **Speed**: 5-6 km/h (brisk walk, not running)
-- This burns fat without killing recovery
+- Burns fat without killing recovery
 
 ---
 
 ## Progression Rules
 
-1. **Add weight when you can do all prescribed reps with clean form.**
+1. **Add weight when all reps are clean with good form.**
    - Upper body: increase by 2.5kg
    - Lower body: increase by 5kg
 
-2. **If you fail a set, keep the weight the same next session.** Don't drop it.
+2. **If you fail a set, keep the weight the same next session.**
 
 3. **Rest between sets:**
-   - Compound lifts (bench, squat, rows, RDL): 90 seconds
+   - Compound lifts (bench, rows, squat, RDL): 90 seconds
    - Isolation lifts (curls, raises, extensions): 60 seconds
 
-4. **Warm up:** 5 min light cardio + 2 warm up sets on your first compound lift.
+4. **Warm up:** 5 min light cardio + 2 warm up sets on first compound.
 
 ---
 
 ## Rules
 
-- **Never skip legs.** The "I'll do arms instead" mentality is dead.
-- **Form over ego.** Drop the weight if form breaks. Nobody cares how much you lift.
-- **Track your weights.** Write them down in your phone notes. You need to know if you're progressing.
-- **19:30 you leave for the gym.** No negotiation. No "I'll go later." Put shoes on, walk out.
+- **Form over ego.** Drop the weight if form breaks.
+- **Track your weights.** Write them down. You need to know if you're progressing.
+- **19:30 you leave for the gym.** No negotiation.
+- **4 days minimum.** Miss a day? Make it up. Don't let 4 become 3.
 
 ---
 
@@ -99,10 +88,9 @@ After every lifting session:
 
 | Month | Check |
 |-------|-------|
-| Month 1 | Are all your lifts going up? Are you consistent 6 days? |
+| Month 1 | Consistent 4 days? All lifts improving? |
 | Month 2 | Visible changes in mirror? Lifts still progressing? |
-| Month 3 (June) | Abs starting to show? Shoulders and arms filling out? |
+| Month 3 | Leaner? Clothes fitting different? Strength maintained? |
 
-If lifts stall for 2+ weeks: eat slightly more (add 100g rice to a meal). You might be under-eating.
-
-If fat isn't dropping: make sure you're actually doing the cardio. No skipping the treadmill.
+If lifts drop significantly: you're cutting too hard. Add 100 cal back.
+If fat isn't dropping: are you actually tracking food? Be honest.
