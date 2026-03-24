@@ -214,11 +214,11 @@ export const MEALS: Meal[] = [
     time: "13:15",
     items: [
       { item: "Chicken breast", amount: "200g", protein: 46, calories: 220 },
-      { item: "Roti", amount: "2 pieces (60g atta)", protein: 6, calories: 200 },
+      { item: "Roti", amount: "3 pieces (90g atta)", protein: 9, calories: 300 },
       { item: "Vegetables", amount: "100g", protein: 3, calories: 35 },
     ],
-    totalProtein: 55,
-    totalCalories: 455,
+    totalProtein: 58,
+    totalCalories: 555,
   },
   {
     name: "Post-Gym Shake",
@@ -235,20 +235,20 @@ export const MEALS: Meal[] = [
     time: "22:30",
     items: [
       { item: "Chicken breast", amount: "200g", protein: 46, calories: 220 },
-      { item: "Roti", amount: "2 pieces (60g atta)", protein: 6, calories: 200 },
+      { item: "Roti", amount: "3 pieces (90g atta)", protein: 9, calories: 300 },
       { item: "Whole eggs", amount: "2", protein: 12, calories: 140 },
       { item: "Vegetables", amount: "100g", protein: 3, calories: 35 },
     ],
-    totalProtein: 67,
-    totalCalories: 595,
+    totalProtein: 70,
+    totalCalories: 695,
   },
 ];
 
 export const DAILY_TARGETS = {
-  calories: 1850,
-  protein: 150,
-  carbs: 160,
-  fat: 45,
+  calories: 2000,
+  protein: 155,
+  carbs: 200,
+  fat: 50,
 } as const;
 
 // ---------------------------------------------------------------------------
