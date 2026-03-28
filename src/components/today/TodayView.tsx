@@ -1,5 +1,3 @@
-import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
 import { useState, useEffect, useMemo } from "react";
 import {
   SCHEDULE,
@@ -19,25 +17,15 @@ import {
   Brain,
 } from "lucide-react";
 import { useWebHaptics } from "web-haptics/react";
-import { useAuth } from "../../lib/auth";
+import {
+  useDailyChecksForDate,
+  useToggleCheck,
+  type CheckType,
+} from "../../lib/store";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
-
-type CheckType =
-  | "meal_breakfast"
-  | "meal_lunch"
-  | "meal_postworkout"
-  | "meal_dinner"
-  | "workout"
-  | "cardio"
-  | "study_morning"
-  | "study_lunch"
-  | "study_commute"
-  | "water"
-  | "sleep_ontime"
-  | "no_doomscroll";
 
 type ChecklistItem = {
   type: CheckType;
@@ -137,12 +125,10 @@ function isBlockPast(block: ScheduleBlock): boolean {
   const [endH, endM] = block.end.split(":").map(Number);
   const endMinutes = endH * 60 + endM;
 
-  // Handle midnight crossover: if endMinutes < startMinutes, block crosses midnight
   const [startH, startM] = block.start.split(":").map(Number);
   const startMinutes = startH * 60 + startM;
 
   if (endMinutes <= startMinutes) {
-    // Midnight-crossing block: past only if current time is past end AND past midnight
     return currentMinutes >= endMinutes && currentMinutes < startMinutes;
   }
   return currentMinutes >= endMinutes;
@@ -172,20 +158,14 @@ function CurrentBlockCard({ block }: { block: ScheduleBlock | null }) {
     );
   }
 
-  const color = CATEGORY_COLORS[block.category] ?? "#6b7280";
-
   return (
-    <div
-      className="glass-card mb-6 border-l-4 border-l-white"
-    >
+    <div className="glass-card mb-6 border-l-4 border-l-white">
       <p className="text-white/40 text-xs uppercase tracking-wider mb-1">
         Current Block
       </p>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-lg font-bold text-white">
-            {block.label}
-          </p>
+          <p className="text-lg font-bold text-white">{block.label}</p>
           <p className="text-white/60 text-sm mt-0.5">{block.activity}</p>
         </div>
         <div className="text-right">
@@ -282,7 +262,6 @@ function MacroBar({
 }
 
 function ScheduleTimeline({ currentBlock, schedule }: { currentBlock: ScheduleBlock | null; schedule: ScheduleBlock[] }) {
-  // Filter out the sleep block to keep the timeline compact
   const timelineBlocks = schedule.filter((b) => b.category !== "sleep");
 
   return (
@@ -293,7 +272,6 @@ function ScheduleTimeline({ currentBlock, schedule }: { currentBlock: ScheduleBl
           block.start === currentBlock.start &&
           block.end === currentBlock.end;
         const isPast = !isCurrent && isBlockPast(block);
-        const color = CATEGORY_COLORS[block.category] ?? "#6b7280";
 
         return (
           <div
@@ -342,9 +320,9 @@ function getHolidayKey(): string {
 }
 
 export function TodayView() {
-  const { userId } = useAuth();
-  const dailyChecks = useQuery(api.daily.listToday, userId ? { userId } : "skip");
-  const toggleCheck = useMutation(api.daily.toggle);
+  const todayISO = getTodayDateISO();
+  const dailyChecks = useDailyChecksForDate(todayISO);
+  const toggleCheck = useToggleCheck();
   const { trigger } = useWebHaptics();
 
   const [isHoliday, setIsHoliday] = useState(() => {
@@ -368,7 +346,6 @@ export function TodayView() {
     getCurrentBlock(new Date())
   );
 
-  // Re-evaluate current block every minute using active schedule
   useEffect(() => {
     const evalBlock = () => {
       const now = new Date();
@@ -397,20 +374,16 @@ export function TodayView() {
     return () => clearInterval(interval);
   }, [activeSchedule]);
 
-  // Build a set of completed check types for fast lookup
   const completedSet = useMemo(() => {
     const set = new Set<string>();
-    if (dailyChecks) {
-      for (const check of dailyChecks) {
-        if (check.completed) {
-          set.add(check.type);
-        }
+    for (const check of dailyChecks) {
+      if (check.completed) {
+        set.add(check.type);
       }
     }
     return set;
   }, [dailyChecks]);
 
-  // Calculate macros from completed meals
   const macros = useMemo(() => {
     let protein = 0;
     let calories = 0;
@@ -423,9 +396,9 @@ export function TodayView() {
     return { protein, calories };
   }, [completedSet]);
 
-  const handleToggle = async (type: CheckType) => {
+  const handleToggle = (type: CheckType) => {
     trigger("success");
-    await toggleCheck({ type, date: getTodayDateISO(), userId: userId! });
+    toggleCheck(type, todayISO);
   };
 
   const completedCount = completedSet.size;

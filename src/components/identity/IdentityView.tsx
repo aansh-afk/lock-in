@@ -1,20 +1,22 @@
 import { useState } from "react";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
 import { Shield, Plus, Trash2 } from "lucide-react";
 import { useWebHaptics } from "web-haptics/react";
-import { useAuth } from "../../lib/auth";
+import {
+  useIdentities,
+  useAddIdentity,
+  useToggleIdentity,
+  useRemoveIdentity,
+} from "../../lib/store";
 
 export function IdentityView() {
-  const { userId } = useAuth();
   const [newStatement, setNewStatement] = useState("");
-  const identities = useQuery(api.identity.list, userId ? { userId } : "skip");
-  const addIdentity = useMutation(api.identity.add);
-  const toggleIdentity = useMutation(api.identity.toggle);
-  const removeIdentity = useMutation(api.identity.remove);
+  const identities = useIdentities();
+  const addIdentity = useAddIdentity();
+  const toggleIdentity = useToggleIdentity();
+  const removeIdentity = useRemoveIdentity();
   const { trigger } = useWebHaptics();
 
-  const handleAdd = async (e: React.FormEvent) => {
+  const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newStatement.trim()) return;
 
@@ -23,13 +25,13 @@ export function IdentityView() {
       statement = "I am someone who " + statement;
     }
 
-    await addIdentity({ statement, userId: userId! });
+    addIdentity(statement);
     trigger("success");
     setNewStatement("");
   };
 
-  const active = identities?.filter((i) => i.active) ?? [];
-  const inactive = identities?.filter((i) => !i.active) ?? [];
+  const active = identities.filter((i) => i.active);
+  const inactive = identities.filter((i) => !i.active);
 
   return (
     <div className="max-w-lg mx-auto px-4 pt-8">
@@ -59,7 +61,7 @@ export function IdentityView() {
           <div className="space-y-2">
             {active.map((identity) => (
               <div
-                key={identity._id}
+                key={identity.id}
                 className="glass-card flex items-center justify-between gap-3"
               >
                 <div className="flex items-center gap-3 min-w-0">
@@ -75,7 +77,7 @@ export function IdentityView() {
                   <button
                     onClick={() => {
                       trigger("nudge");
-                      toggleIdentity({ id: identity._id, userId: userId! });
+                      toggleIdentity(identity.id);
                     }}
                     className="text-white/30 hover:text-yellow-400 transition-colors text-xs"
                   >
@@ -84,7 +86,7 @@ export function IdentityView() {
                   <button
                     onClick={() => {
                       trigger("error");
-                      removeIdentity({ id: identity._id, userId: userId! });
+                      removeIdentity(identity.id);
                     }}
                     className="text-white/30 hover:text-red-400 transition-colors"
                   >
@@ -106,7 +108,7 @@ export function IdentityView() {
           <div className="space-y-2">
             {inactive.map((identity) => (
               <div
-                key={identity._id}
+                key={identity.id}
                 className="glass-card flex items-center justify-between opacity-50"
               >
                 <p className="text-white/50 text-sm truncate">
@@ -115,7 +117,7 @@ export function IdentityView() {
                 <button
                   onClick={() => {
                     trigger("success");
-                    toggleIdentity({ id: identity._id, userId: userId! });
+                    toggleIdentity(identity.id);
                   }}
                   className="text-white/30 hover:text-[#00d4ff] transition-colors text-xs shrink-0"
                 >

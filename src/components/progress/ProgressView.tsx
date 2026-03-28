@@ -1,44 +1,20 @@
-import { useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
 import { useState, useMemo } from "react";
-import { useAuth } from "../../lib/auth";
+import {
+  useDailyChecksForDate,
+  useRecentChecks,
+  useStreak,
+  type CheckType,
+  type DailyCheck,
+} from "../../lib/store";
 import {
   getDayNumber,
   getDaysUntilExam,
   getDaysUntilMayExam,
   getAllDaysSinceStart,
-  START_DATE,
   STUDY_MODULES,
   RETAKE_MODULES,
   getRetakePhase,
 } from "../../lib/constants";
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-type CheckType =
-  | "meal_breakfast"
-  | "meal_lunch"
-  | "meal_postworkout"
-  | "meal_dinner"
-  | "workout"
-  | "cardio"
-  | "study_morning"
-  | "study_lunch"
-  | "study_commute"
-  | "water"
-  | "sleep_ontime"
-  | "no_doomscroll";
-
-type DailyCheck = {
-  _id: string;
-  _creationTime: number;
-  userId: string;
-  date: string;
-  type: CheckType;
-  completed: boolean;
-};
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -118,7 +94,6 @@ function formatShortDate(dateStr: string): string {
 // SVG Chart Components
 // ---------------------------------------------------------------------------
 
-/** Line chart showing daily completion score over last 14 days */
 function CompletionLineChart({ data }: { data: Array<{ date: string; score: number }> }) {
   const width = 320;
   const height = 120;
@@ -139,12 +114,10 @@ function CompletionLineChart({ data }: { data: Array<{ date: string; score: numb
     .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
     .join(" ");
 
-  // Area fill
   const areaD = `${pathD} L ${points[points.length - 1].x} ${padding.top + chartH} L ${points[0].x} ${padding.top + chartH} Z`;
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full">
-      {/* Grid lines */}
       {[0, 3, 6, 9, 12].map((v) => {
         const y = padding.top + chartH - (v / maxScore) * chartH;
         return (
@@ -154,19 +127,11 @@ function CompletionLineChart({ data }: { data: Array<{ date: string; score: numb
           </g>
         );
       })}
-
-      {/* Area */}
       <path d={areaD} fill="#FAD399" fillOpacity="0.08" />
-
-      {/* Line */}
       <path d={pathD} fill="none" stroke="#FAD399" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
-
-      {/* Dots */}
       {points.map((p, i) => (
         <circle key={i} cx={p.x} cy={p.y} r="2.5" fill={p.score >= 10 ? "#FAD399" : p.score >= 6 ? "#c48b3f" : "#555"} />
       ))}
-
-      {/* X-axis labels (every other day) */}
       {points.filter((_, i) => i % 2 === 0 || i === points.length - 1).map((p, i) => (
         <text key={i} x={p.x} y={height - 4} textAnchor="middle" fill="#FAD399" fillOpacity="0.3" fontSize="6" fontFamily="monospace">
           {formatShortDate(p.date)}
@@ -176,7 +141,6 @@ function CompletionLineChart({ data }: { data: Array<{ date: string; score: numb
   );
 }
 
-/** Radar chart for category balance */
 function CategoryRadar({ categories }: { categories: Array<{ name: string; pct: number }> }) {
   const size = 200;
   const cx = size / 2;
@@ -185,44 +149,32 @@ function CategoryRadar({ categories }: { categories: Array<{ name: string; pct: 
   const n = categories.length;
 
   const angleStep = (2 * Math.PI) / n;
-  const startAngle = -Math.PI / 2; // Start from top
+  const startAngle = -Math.PI / 2;
 
   const getPoint = (i: number, r: number) => ({
     x: cx + r * Math.cos(startAngle + i * angleStep),
     y: cy + r * Math.sin(startAngle + i * angleStep),
   });
 
-  // Grid rings
   const rings = [0.25, 0.5, 0.75, 1.0];
-
-  // Data polygon
   const dataPoints = categories.map((cat, i) => getPoint(i, (cat.pct / 100) * maxR));
   const dataPath = dataPoints.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ") + " Z";
 
   return (
     <svg viewBox={`0 0 ${size} ${size}`} className="w-full max-w-[200px] mx-auto">
-      {/* Grid rings */}
       {rings.map((r) => {
         const ringPoints = Array.from({ length: n }, (_, i) => getPoint(i, r * maxR));
         const ringPath = ringPoints.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ") + " Z";
         return <path key={r} d={ringPath} fill="none" stroke="#222" strokeWidth="0.5" />;
       })}
-
-      {/* Spokes */}
       {categories.map((_, i) => {
         const p = getPoint(i, maxR);
         return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="#222" strokeWidth="0.5" />;
       })}
-
-      {/* Data area */}
       <path d={dataPath} fill="#FAD399" fillOpacity="0.15" stroke="#FAD399" strokeWidth="1.5" strokeLinejoin="round" />
-
-      {/* Data dots */}
       {dataPoints.map((p, i) => (
         <circle key={i} cx={p.x} cy={p.y} r="3" fill="#FAD399" />
       ))}
-
-      {/* Labels */}
       {categories.map((cat, i) => {
         const labelR = maxR + 18;
         const p = getPoint(i, labelR);
@@ -236,7 +188,6 @@ function CategoryRadar({ categories }: { categories: Array<{ name: string; pct: 
   );
 }
 
-/** Vertical bar chart for weekly category scores */
 function WeeklyBars({ data }: { data: Array<{ day: string; score: number; dayAbbr: string }> }) {
   const width = 320;
   const height = 80;
@@ -254,17 +205,13 @@ function WeeklyBars({ data }: { data: Array<{ day: string; score: number; dayAbb
         const isToday = i === data.length - 1;
         return (
           <g key={d.day}>
-            {/* Bar background */}
             <rect x={x} y={padding.top} width={barW} height={chartH} rx="2" fill="#111" />
-            {/* Bar fill */}
             <rect x={x} y={y} width={barW} height={barH} rx="2" fill={isToday ? "#FAD399" : "#FAD399"} fillOpacity={isToday ? 1 : 0.5} />
-            {/* Score */}
             {d.score > 0 && (
               <text x={x + barW / 2} y={y - 3} textAnchor="middle" fill="#FAD399" fillOpacity="0.6" fontSize="7" fontFamily="monospace">
                 {d.score}
               </text>
             )}
-            {/* Day label */}
             <text x={x + barW / 2} y={height - 3} textAnchor="middle" fill="#FAD399" fillOpacity="0.3" fontSize="7" fontFamily="monospace">
               {d.dayAbbr}
             </text>
@@ -275,7 +222,6 @@ function WeeklyBars({ data }: { data: Array<{ day: string; score: number; dayAbb
   );
 }
 
-/** Small ring/donut for a single metric */
 function DonutChart({ value, max, label, sublabel }: { value: number; max: number; label: string; sublabel?: string }) {
   const r = 32;
   const stroke = 5;
@@ -307,21 +253,15 @@ function DonutChart({ value, max, label, sublabel }: { value: number; max: numbe
   );
 }
 
-/** Calendar heatmap grid for the month */
 function CalendarHeatmap({ checksByDate, allDays }: { checksByDate: Record<string, DailyCheck[]>; allDays: string[] }) {
-  // Show last 28 days max
   const days = allDays.slice(-28);
   const firstDay = new Date(days[0] + "T12:00:00");
-  const startDow = firstDay.getDay(); // 0=Sun
+  const startDow = firstDay.getDay();
 
-  // Build grid: 4 rows x 7 cols
   const cells: Array<{ date: string | null; count: number }> = [];
-
-  // Empty cells before first day
   for (let i = 0; i < startDow; i++) {
     cells.push({ date: null, count: 0 });
   }
-
   for (const day of days) {
     const dayChecks = checksByDate[day] ?? [];
     const count = dayChecks.filter((c) => c.completed).length;
@@ -337,13 +277,11 @@ function CalendarHeatmap({ checksByDate, allDays }: { checksByDate: Record<strin
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full">
-      {/* Day headers */}
       {DAY_ABBREVS.map((d, i) => (
         <text key={i} x={i * (cellSize + gap) + cellSize / 2} y="8" textAnchor="middle" fill="#FAD399" fillOpacity="0.25" fontSize="6" fontFamily="monospace">
           {d}
         </text>
       ))}
-      {/* Cells */}
       {cells.map((cell, i) => {
         const col = i % cols;
         const row = Math.floor(i / cols);
@@ -406,12 +344,10 @@ function DailyLogSection({ dateStr, checks }: { dateStr: string; checks: DailyCh
 // ---------------------------------------------------------------------------
 
 export function ProgressView() {
-  const { userId } = useAuth();
-  const recentChecks = useQuery(api.daily.listRecent, userId ? { userId } : "skip");
-  const streak = useQuery(api.daily.getStreak, userId ? { userId } : "skip");
-  const todayChecks = useQuery(api.daily.listToday, userId ? { userId } : "skip");
-
-  const isLoading = recentChecks === undefined || streak === undefined || todayChecks === undefined;
+  const recentChecks = useRecentChecks();
+  const streak = useStreak();
+  const todayISO = new Date().toISOString().split("T")[0];
+  const todayChecks = useDailyChecksForDate(todayISO);
 
   const now = new Date();
   const dayNumber = getDayNumber(now);
@@ -419,9 +355,7 @@ export function ProgressView() {
   const daysUntilMayExam = getDaysUntilMayExam(now);
   const retakePhase = getRetakePhase(now);
 
-  // Today's score
   const todayScore = useMemo(() => {
-    if (!todayChecks) return 0;
     return todayChecks.filter((c) => c.completed).length;
   }, [todayChecks]);
 
@@ -432,15 +366,13 @@ export function ProgressView() {
   // Group checks by date
   const checksByDate = useMemo(() => {
     const map: Record<string, DailyCheck[]> = {};
-    if (!recentChecks) return map;
     for (const check of recentChecks) {
       if (!map[check.date]) map[check.date] = [];
-      map[check.date].push(check as DailyCheck);
+      map[check.date].push(check);
     }
     return map;
   }, [recentChecks]);
 
-  // 14-day line chart data
   const lineData = useMemo(() => {
     return last14Days.map((date) => {
       const dayChecks = checksByDate[date] ?? [];
@@ -448,7 +380,6 @@ export function ProgressView() {
     });
   }, [last14Days, checksByDate]);
 
-  // 7-day bar chart data
   const barData = useMemo(() => {
     return last7Days.map((date) => {
       const dayChecks = checksByDate[date] ?? [];
@@ -461,7 +392,6 @@ export function ProgressView() {
     });
   }, [last7Days, checksByDate]);
 
-  // Category radar data (7-day %)
   const radarData = useMemo(() => {
     return CATEGORIES.map((cat) => {
       let completed = 0;
@@ -476,7 +406,6 @@ export function ProgressView() {
     });
   }, [last7Days, checksByDate]);
 
-  // Category donut data (7-day)
   const categoryDonuts = useMemo(() => {
     return CATEGORIES.map((cat) => {
       let completed = 0;
@@ -491,7 +420,6 @@ export function ProgressView() {
     });
   }, [last7Days, checksByDate]);
 
-  // Overall 7-day completion %
   const weeklyPct = useMemo(() => {
     let total = 0;
     let completed = 0;
@@ -503,30 +431,13 @@ export function ProgressView() {
     return total > 0 ? Math.round((completed / total) * 100) : 0;
   }, [last7Days, checksByDate]);
 
-  // Current study module
   const currentModule = useMemo(() => {
-    const month = now.getMonth(); // 0-indexed
-    if (month === 2) return STUDY_MODULES[0]; // March - Module 3
-    if (month === 3) return STUDY_MODULES[1]; // April - Module 4
-    if (month >= 4) return STUDY_MODULES[2]; // May+ - Module 5
+    const month = now.getMonth();
+    if (month === 2) return STUDY_MODULES[0];
+    if (month === 3) return STUDY_MODULES[1];
+    if (month >= 4) return STUDY_MODULES[2];
     return STUDY_MODULES[0];
   }, []);
-
-  if (isLoading) {
-    return (
-      <div className="max-w-lg mx-auto px-4 pt-8 pb-28">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-widest uppercase">PROGRESS</h1>
-          <p className="text-[#FAD399]/30 text-sm mt-0.5">the wheel turns</p>
-        </div>
-        <div className="space-y-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="glass-card animate-pulse h-20" />
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-lg mx-auto px-4 pt-8 pb-28">

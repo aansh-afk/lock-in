@@ -12,16 +12,16 @@ import {
   Check,
 } from "lucide-react";
 import { MEALS, DAILY_TARGETS, RECIPES, type Meal } from "../../lib/constants";
-import { useQuery, useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
 import { useWebHaptics } from "web-haptics/react";
-import { useAuth } from "../../lib/auth";
+import {
+  useDailyChecksForDate,
+  useToggleCheck,
+  type CheckType,
+} from "../../lib/store";
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-
-type CheckType = "meal_breakfast" | "meal_lunch" | "meal_postworkout" | "meal_dinner" | "workout" | "cardio" | "study_morning" | "study_lunch" | "study_commute" | "water" | "sleep_ontime" | "no_doomscroll";
 
 const mealCheckType: Record<string, CheckType> = {
   Breakfast: "meal_breakfast",
@@ -40,7 +40,7 @@ const MEAL_EXTRA_MACROS: Record<string, { carbs: number; fat: number }> = {
 
 const BONUS_ITEMS = [
   { label: "Extra rice (lunch + dinner)", cal: 260, protein: 0 },
-  { label: "Peanut butter 2 tbsp", cal: 190, protein: 8 },
+  { label: "Peanut butter 2 tbps", cal: 190, protein: 8 },
   { label: "Milk in shakes (300ml x2)", cal: 400, protein: 20 },
   { label: "Nuts handful", cal: 150, protein: 0 },
 ] as const;
@@ -260,25 +260,22 @@ function CollapsibleSection({
 // ---------------------------------------------------------------------------
 
 export function MealsView() {
-  const { userId } = useAuth();
-  const todayChecks = useQuery(api.daily.listToday, userId ? { userId } : "skip");
-  const toggleCheck = useMutation(api.daily.toggle);
+  const todayISO = getTodayDateISO();
+  const todayChecks = useDailyChecksForDate(todayISO);
+  const toggleCheck = useToggleCheck();
   const { trigger } = useWebHaptics();
 
   // Build a set of completed check types for fast lookup
   const completedSet = useMemo(() => {
     const set = new Set<string>();
-    if (todayChecks) {
-      for (const check of todayChecks) {
-        if (check.completed) {
-          set.add(check.type);
-        }
+    for (const check of todayChecks) {
+      if (check.completed) {
+        set.add(check.type);
       }
     }
     return set;
   }, [todayChecks]);
 
-  // Check helpers
   const isMealDone = (mealName: string): boolean => {
     const checkType = mealCheckType[mealName];
     return checkType ? completedSet.has(checkType) : false;
@@ -309,17 +306,16 @@ export function MealsView() {
     return { calories, protein, carbs, fat };
   }, [completedSet]);
 
-  // Toggle handlers
-  const handleMealToggle = async (mealName: string) => {
+  const handleMealToggle = (mealName: string) => {
     const checkType = mealCheckType[mealName];
     if (!checkType) return;
     trigger("success");
-    await toggleCheck({ type: checkType, date: getTodayDateISO(), userId: userId! });
+    toggleCheck(checkType, todayISO);
   };
 
-  const handleWaterToggle = async () => {
+  const handleWaterToggle = () => {
     trigger("success");
-    await toggleCheck({ type: "water", date: getTodayDateISO(), userId: userId! });
+    toggleCheck("water", todayISO);
   };
 
   return (

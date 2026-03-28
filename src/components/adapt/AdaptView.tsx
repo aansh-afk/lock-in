@@ -1,23 +1,20 @@
 import { useState } from "react";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
 import { useWebHaptics } from "web-haptics/react";
-import { useAuth } from "../../lib/auth";
+import { useAdaptations, useAddAdaptation } from "../../lib/store";
 
 export function AdaptView() {
-  const { userId } = useAuth();
   const [hit, setHit] = useState("");
   const [adaptation, setAdaptation] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const addAdaptation = useMutation(api.adaptations.add);
-  const recentAdaptations = useQuery(api.adaptations.list, userId ? { userId } : "skip");
+  const addAdaptation = useAddAdaptation();
+  const recentAdaptations = useAdaptations();
   const { trigger } = useWebHaptics();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!hit.trim() || !adaptation.trim()) return;
 
-    await addAdaptation({ hit: hit.trim(), adaptation: adaptation.trim(), userId: userId! });
+    addAdaptation(hit.trim(), adaptation.trim());
     trigger("success");
     setHit("");
     setAdaptation("");
@@ -25,7 +22,7 @@ export function AdaptView() {
     setTimeout(() => setSubmitted(false), 2000);
   };
 
-  const recent = recentAdaptations?.slice(0, 5) ?? [];
+  const recent = recentAdaptations.slice(0, 5);
 
   return (
     <div className="max-w-lg mx-auto px-4 pt-8">
@@ -75,7 +72,7 @@ export function AdaptView() {
           </h3>
           <div className="space-y-3">
             {recent.map((a) => (
-              <div key={a._id} className="glass-card">
+              <div key={a.id} className="glass-card">
                 <p className="text-white/50 text-sm">
                   <span className="text-red-400/70">Hit:</span> {a.hit}
                 </p>
@@ -84,7 +81,7 @@ export function AdaptView() {
                   {a.adaptation}
                 </p>
                 <p className="text-white/20 text-xs mt-2">
-                  {new Date(a._creationTime).toLocaleDateString()}
+                  {new Date(a.createdAt).toLocaleDateString()}
                 </p>
               </div>
             ))}

@@ -1,7 +1,9 @@
-import { useQuery } from "convex/react";
-import { api } from "../../../convex/_generated/api";
 import { useState, useEffect } from "react";
-import { useAuth } from "../../lib/auth";
+import {
+  useAdaptations,
+  useIdentities,
+  useStreak,
+} from "../../lib/store";
 
 const SPOKE_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315] as const;
 const CX = 100;
@@ -25,22 +27,20 @@ function spokeStart(angleDeg: number) {
 }
 
 export function WheelView() {
-  const { userId } = useAuth();
-  const adaptations = useQuery(api.adaptations.list, userId ? { userId } : "skip");
-  const identities = useQuery(api.identity.list, userId ? { userId } : "skip");
-  const streak = useQuery(api.daily.getStreak, userId ? { userId } : "skip");
+  const adaptations = useAdaptations();
+  const identities = useIdentities();
+  const streak = useStreak();
   const [rotation, setRotation] = useState(0);
   const [prevCount, setPrevCount] = useState(0);
 
-  const todayCount =
-    adaptations?.filter((a) => {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      return a._creationTime >= today.getTime();
-    }).length ?? 0;
+  const todayCount = adaptations.filter((a) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return a.createdAt >= today.getTime();
+  }).length;
 
-  const totalCount = adaptations?.length ?? 0;
-  const activeIdentities = identities?.filter((i) => i.active) ?? [];
+  const totalCount = adaptations.length;
+  const activeIdentities = identities.filter((i) => i.active);
 
   useEffect(() => {
     if (totalCount > prevCount && prevCount !== 0) {
@@ -111,7 +111,6 @@ export function WheelView() {
               const pos = spokeEnd(angle, OUTER_R);
               return (
                 <g key={`node-${i}`}>
-                  {/* Node circle */}
                   <circle
                     cx={pos.x}
                     cy={pos.y}
@@ -174,7 +173,7 @@ export function WheelView() {
           <p className="text-white/40 text-xs mt-1">identities</p>
         </div>
         <div className="glass-card text-center">
-          <p className="text-2xl font-bold text-white">{streak ?? 0}</p>
+          <p className="text-2xl font-bold text-white">{streak}</p>
           <p className="text-white/40 text-xs mt-1">day streak</p>
         </div>
       </div>

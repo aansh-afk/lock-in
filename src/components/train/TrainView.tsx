@@ -1,5 +1,3 @@
-import { useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
 import { useState, useEffect, useCallback } from "react";
 import {
   getTodayWorkout,
@@ -9,7 +7,7 @@ import {
 } from "../../lib/constants";
 import { Dumbbell, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { useWebHaptics } from "web-haptics/react";
-import { useAuth } from "../../lib/auth";
+import { useToggleCheck } from "../../lib/store";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -227,8 +225,7 @@ function RestDayView() {
 // ---------------------------------------------------------------------------
 
 export function TrainView() {
-  const { userId } = useAuth();
-  const toggleCheck = useMutation(api.daily.toggle);
+  const toggleCheck = useToggleCheck();
   const { trigger } = useWebHaptics();
 
   const todayISO = getTodayDateISO();
@@ -270,7 +267,7 @@ export function TrainView() {
     if (allExercisesDone && !workoutToggled) {
       trigger("success");
       setWorkoutToggled(true);
-      void toggleCheck({ type: "workout", date: getTodayDateISO(), userId: userId! });
+      toggleCheck("workout", getTodayDateISO());
     }
   }, [allExercisesDone, workoutToggled, trigger, toggleCheck]);
 
@@ -278,7 +275,7 @@ export function TrainView() {
   useEffect(() => {
     if (cardioComplete && !cardioToggled) {
       setCardioToggled(true);
-      void toggleCheck({ type: "cardio", date: getTodayDateISO(), userId: userId! });
+      toggleCheck("cardio", getTodayDateISO());
     }
   }, [cardioComplete, cardioToggled, toggleCheck]);
 
@@ -292,7 +289,6 @@ export function TrainView() {
         } else {
           next.add(index);
         }
-        // Persist to localStorage immediately
         try {
           localStorage.setItem(trainKey, JSON.stringify([...next]));
         } catch {
