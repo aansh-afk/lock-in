@@ -286,7 +286,7 @@ export function StudyView() {
           Target: 95%+
         </span>
         <span className="glass px-3 py-1.5 text-[11px] text-white/40 font-medium">
-          Exams: June 2026
+          DGCA June 16–20
         </span>
       </div>
     </div>

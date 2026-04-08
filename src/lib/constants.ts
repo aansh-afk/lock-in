@@ -407,80 +407,84 @@ export const WORKOUT_CYCLE: Array<"upper" | "lower" | "rest"> = [
 
 export const STUDY_MODULES: StudyModule[] = [
   {
-    number: 3,
-    name: "Electrical Fundamentals (Retake)",
+    number: 6,
+    name: "Materials and Hardware",
     month: 1,
     weeks: [
       {
         week: "Week 1",
         topics: [
-          "DC Foundations",
-          "Electron Theory",
-          "Static Electricity",
-          "Electrical Terminology",
-          "Generation of Electricity",
-          "DC Sources",
+          "6.1 Ferrous Materials — alloy steels, heat treatment, testing (L2)",
+          "6.2 Non-Ferrous — aluminium, titanium, copper, magnesium, Alclad (L2)",
+          "6.3 Composites — fibre-reinforced, carbon fibre, Kevlar, honeycomb (L2)",
         ],
       },
       {
         week: "Week 2",
         topics: [
-          "DC Circuits and Components",
-          "DC Circuits",
-          "Resistance/Resistor",
-          "Power",
-          "Capacitance/Capacitor",
+          "6.4 Corrosion — ALL types, galvanic series, prevention, treatment (L3 ★)",
+          "6.4 Deep dive — pitting, inter-granular, stress, exfoliation, fretting, microbiological",
         ],
       },
       {
         week: "Week 3",
         topics: [
-          "Magnetism and AC Foundations",
-          "Magnetism",
-          "Inductance/Inductor",
-          "DC Motor/Generator Theory",
-          "AC Theory",
+          "6.5 Fasteners — screw threads, bolts, studs, locking devices, rivets (L2)",
+          "6.6 Pipes and Unions — rigid/flexible, connectors, standard unions (L2)",
+          "6.11 Electrical Cables and Connectors — crimping, coaxial, identification (L2)",
         ],
       },
       {
         week: "Week 4",
         topics: [
-          "AC Systems",
-          "R/C/L Circuits",
-          "Transformers",
-          "Filters",
-          "AC Generators",
-          "AC Motors",
-          "Practice exam",
+          "6.7 Springs — types, materials, applications (L2)",
+          "6.8 Bearings — plain, roller, ball, loads, materials (L2)",
+          "6.9 Transmissions — gear types, ratios, belts, chains (L2)",
+          "6.10 Control Cables — swaging, inspection, tension, Bowden (L2)",
+          "Practice papers — 80 MCQ timed mocks",
         ],
       },
     ],
   },
   {
-    number: 4,
-    name: "Electronic Fundamentals (New)",
+    number: 7,
+    name: "Maintenance Practices",
     month: 2,
     weeks: [
       {
-        week: "Week 1-2",
+        week: "Week 1",
         topics: [
-          "Semiconductors",
-          "Diodes",
-          "Transistors",
-          "Integrated circuits",
+          "7.1 Safety Precautions — fire extinguishers, workshop safety (L3 ★)",
+          "7.2 Workshop Practices (L3 ★)",
+          "7.3 Tools — torque wrenches, micrometers, verniers, power tools (L3 ★)",
+        ],
+      },
+      {
+        week: "Week 2",
+        topics: [
+          "7.5 Engineering Drawings — ATA 100, ISO, AN, MS, NAS standards (L2)",
+          "7.6 Fits and Clearances — drill sizes, classes of fits, tolerances (L2)",
+          "7.7 EWIS — crimping, bonding, testing, cable looming, shielding (L3 ★)",
         ],
       },
       {
         week: "Week 3",
-        topics: ["PCBs and Servomechanisms"],
+        topics: [
+          "7.8 Riveting — joints, spacing, pitch, dimpling, inspection (L2)",
+          "7.9-7.13 Pipes, Springs, Bearings, Transmissions, Control Cables (L2)",
+          "7.14 Sheet Metal + Composite repair (L2)",
+          "7.15 Welding, Brazing, Soldering, Bonding (L2)",
+        ],
       },
       {
         week: "Week 4",
         topics: [
-          "Radio Communication",
-          "ELT",
-          "ADS-B",
-          "Practice questions",
+          "7.16 Weight and Balance — CG calculation, weighing procedures (L2)",
+          "7.17 Aircraft Handling — taxiing, towing, jacking, storage (L2)",
+          "7.18 Disassembly/Inspection/Repair/Assembly — defect types (L3 ★)",
+          "7.19 Abnormal Events — hard landing, lightning, turbulence (L2)",
+          "7.20 Maintenance Procedures — MEL, ADs, SBs, CRS (L2)",
+          "Practice papers — 80 MCQ + 2 essays timed mocks",
         ],
       },
     ],
@@ -491,12 +495,25 @@ export const STUDY_MODULES: StudyModule[] = [
     month: 3,
     weeks: [
       {
-        week: "Week 1-2",
+        week: "Week 1",
         topics: [
-          "Numbering Systems",
-          "Logic Circuits",
-          "Data Buses",
-          "Computer Structure",
+          "5.2 Numbering Systems — binary, octal, hex, conversions (L1)",
+          "5.5 Logic Circuits — AND/OR/NAND/NOR/XOR, truth tables (L2)",
+          "5.6 Computer Structure — CPU, RAM, ROM, EPROM, firmware (L2)",
+          "5.3 Data Conversion — ADC/DAC operation (L1)",
+          "5.4 Data Buses — ARINC 429, ARINC 629 (L2)",
+        ],
+      },
+      {
+        week: "Week 2",
+        topics: [
+          "5.10 Fibre Optics — transmission, connectors, couplers (L1)",
+          "5.11 Electronic Displays — CRT, LED, LCD, EFIS, EICAS, ECAM (L2)",
+          "5.12 ESD — handling precautions, wrist straps, packaging (L2)",
+          "5.13 Software Management Control (L2)",
+          "5.14 EME — EMC, EMI, HIRF, lightning protection (L2)",
+          "5.15 Typical Aircraft Systems — ACARS, FBW, FMS, GPS, TCAS, BITE (L2)",
+          "Practice papers — 40 MCQ timed mocks",
         ],
       },
     ],
@@ -507,24 +524,24 @@ export const STUDY_MODULES: StudyModule[] = [
     month: 3,
     weeks: [
       {
-        week: "Week 3",
+        week: "Week 1",
         topics: [
-          "CAR 66 - All topics up to Subpart C (detail)",
-          "CAR 145 - All topics + AMC & CA Forms",
-          "CAR-M - CAMO, ARC, Continuing Airworthiness",
-          "CAR 21 - CA Forms, Subparts, Findings, Validity",
+          "10.1 Regulatory Framework — ICAO, DGCA, CAR relationships (L1)",
+          "10.2 CAR 66 — Certifying Staff, detailed (L2)",
+          "10.3 CAR 145 — Approved Maintenance Organisations (L2)",
+          "10.5 CAR 21 — Certification, C of A, Registration (L1-2)",
+          "10.6 CAR-M — Continuing Airworthiness (L2)",
         ],
       },
       {
-        week: "Week 4",
+        week: "Week 2",
         topics: [
-          "Series B, C, F, H, M, T, X",
-          "Section 8 - Landing categories, ETOPS, Nav",
-          "CAP 3100 (AoP & Indexes, Annex)",
-          "SMS (Full)",
-          "FTST (145/CAR-M) - 7-10 questions",
+          "10.4 Air Operations — CAR-OPS, AOC, MEL/CDL (L1)",
+          "10.7 National/International Req — ADs, SBs, mods, ETOPS (L1-2)",
+          "10.8 Safety Management System (L2)",
+          "10.9 Fuel Tank Safety (L1)",
           "Rules, Acts & ICAO Annexes",
-          "Exam Prep all modules",
+          "Full mock — 40 MCQ + 1 essay timed",
         ],
       },
     ],
@@ -535,20 +552,11 @@ export const STUDY_MODULES: StudyModule[] = [
 // Timeline
 // ---------------------------------------------------------------------------
 
-/** Day 1 of the lock-in */
-export const START_DATE = new Date("2026-03-15T00:00:00");
+/** Day 1 of the lock-in (fresh start) */
+export const START_DATE = new Date("2026-04-08T00:00:00");
 
-/** M8/M9 on-demand exam target */
-export const MAY_EXAM_DATE = new Date("2026-05-15T00:00:00");
-
-/** M3/M4/M5/M10 exam target date */
-export const EXAM_DATE = new Date("2026-06-15T00:00:00");
-
-/** Days until M8/M9 May exam */
-export function getDaysUntilMayExam(date: Date): number {
-  const diff = MAY_EXAM_DATE.getTime() - date.getTime();
-  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-}
+/** DGCA Session 02 exam window: June 16-20, 2026 */
+export const EXAM_DATE = new Date("2026-06-16T00:00:00");
 
 /** How many days since the lock-in started (0-indexed, day 1 = 0) */
 export function getDayNumber(date: Date): number {
@@ -586,145 +594,27 @@ export const NON_NEGOTIABLES: string[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// M8/M9 Retake Study Plan (May on-demand exam)
+// Exam Info
 // ---------------------------------------------------------------------------
 
-export type ExamModule = {
-  number: number;
-  name: string;
-  topics: Array<{ section: string; subtopics: string[] }>;
-};
-
-export const RETAKE_MODULES: ExamModule[] = [
-  {
-    number: 8,
-    name: "Basic Aerodynamics",
-    topics: [
-      {
-        section: "Physics of the Atmosphere",
-        subtopics: ["ISA", "Pressure", "Temperature", "Density", "Altitude"],
-      },
-      {
-        section: "Aerodynamics",
-        subtopics: [
-          "Airflow around a body",
-          "Boundary layer",
-          "Drag (parasite, induced, total)",
-          "Lift (Bernoulli, Newton)",
-          "Lift/drag ratio",
-          "Aerofoil contamination (ice, frost)",
-        ],
-      },
-      {
-        section: "Theory of Flight",
-        subtopics: [
-          "Relationship between lift, weight, thrust, drag",
-          "Glide ratio",
-          "Steady-state flights",
-          "Load factor in turns",
-          "Stalling",
-        ],
-      },
-      {
-        section: "Flight Stability and Dynamics",
-        subtopics: [
-          "Longitudinal, lateral, directional stability",
-          "Static and dynamic stability",
-        ],
-      },
-    ],
-  },
-  {
-    number: 9,
-    name: "Human Factors",
-    topics: [
-      {
-        section: "General",
-        subtopics: [
-          "Human error models (SHELL, Reason)",
-          "Murphy's law",
-          "Error types & error chains",
-        ],
-      },
-      {
-        section: "Human Performance & Limitations",
-        subtopics: [
-          "Vision and visual limitations",
-          "Hearing and noise",
-          "Information processing",
-          "Attention and perception",
-          "Memory (sensory, short-term, long-term)",
-          "Claustrophobia and physical access",
-        ],
-      },
-      {
-        section: "Social Psychology",
-        subtopics: [
-          "Responsibility - individual and group",
-          "Motivation and demotivation",
-          "Peer pressure",
-          "Teamwork and team management",
-        ],
-      },
-      {
-        section: "Factors Affecting Performance",
-        subtopics: [
-          "Fitness/health",
-          "Stress (domestic/work)",
-          "Time pressure and deadlines",
-          "Workload (overload/underload)",
-          "Sleep and fatigue",
-          "Alcohol, medication, drugs",
-          "Shift work",
-        ],
-      },
-      {
-        section: "Physical Environment",
-        subtopics: [
-          "Noise and fumes",
-          "Illumination",
-          "Climate and temperature",
-          "Workplace design/ergonomics",
-        ],
-      },
-      {
-        section: "Tasks & Communication",
-        subtopics: [
-          "Visual inspection and visual aids",
-          "Repetitive tasks",
-          "Communication within and between teams",
-          "Logging and recording",
-          "Keeping up to date (currency)",
-        ],
-      },
-      {
-        section: "Human Error in Maintenance",
-        subtopics: [
-          "Error models specific to aviation maintenance",
-          "Implications of errors",
-          "Avoiding and managing errors (dirty dozen)",
-        ],
-      },
-    ],
-  },
-];
-
-/** 8-week study phases for M8/M9 retake */
-export const RETAKE_PHASES = [
-  { weeks: "1-2", label: "Gap Finding", activity: "Practice papers for both modules, identify weak topics" },
-  { weeks: "3-4", label: "Deep Dive", activity: "Target weak sections, reread + handwrite notes" },
-  { weeks: "5-6", label: "Drill", activity: "Timed practice papers, mixed questions" },
-  { weeks: "7-8", label: "Lock In", activity: "Full mock exams, review all mistakes" },
-] as const;
-
-/** Returns current retake phase based on weeks since start */
-export function getRetakePhase(date: Date): typeof RETAKE_PHASES[number] {
-  const weeksSinceStart = Math.floor(getDayNumber(date) / 7);
-  if (weeksSinceStart < 2) return RETAKE_PHASES[0];
-  if (weeksSinceStart < 4) return RETAKE_PHASES[1];
-  if (weeksSinceStart < 6) return RETAKE_PHASES[2];
-  return RETAKE_PHASES[3];
-}
+export const EXAM_INFO = {
+  session: "Session 02 of 2026",
+  window: "June 16–20, 2026",
+  passmark: 75,
+  target: 95,
+  modules: [
+    { number: 5, name: "Digital Techniques", questions: "40 MCQ", time: "50 min", level3: false },
+    { number: 6, name: "Materials & Hardware", questions: "80 MCQ", time: "100 min", level3: true },
+    { number: 7, name: "Maintenance Practices", questions: "80 MCQ + 2 essays", time: "140 min", level3: true },
+    { number: 10, name: "Aviation Legislation", questions: "40 MCQ + 1 essay", time: "70 min", level3: false },
+  ],
+  rules: [
+    "75% pass for MCQ and essay independently",
+    "No negative marking",
+    "90-day wait after failed attempt",
+    "All first attempts — no retakes",
+  ],
+} as const;
 
 // ---------------------------------------------------------------------------
 // Holiday Schedule (replaces weekday schedule on holidays)
@@ -732,14 +622,13 @@ export function getRetakePhase(date: Date): typeof RETAKE_PHASES[number] {
 
 export const HOLIDAY_SCHEDULE: ScheduleBlock[] = [
   { start: "07:30", end: "08:00", label: "WAKE", activity: "Wake up, get ready, whey + banana", category: "wake" },
-  { start: "08:00", end: "10:00", label: "M8 STUDY", activity: "Module 8 - Aerodynamics deep study", category: "study" },
-  { start: "10:00", end: "10:15", label: "BREAK", activity: "Short break", category: "break" },
-  { start: "10:15", end: "12:15", label: "M9 STUDY", activity: "Module 9 - Human Factors deep study", category: "study" },
-  { start: "12:15", end: "13:00", label: "LUNCH", activity: "Eat prepped meal", category: "lunch" },
-  { start: "13:00", end: "14:30", label: "MAIN STUDY", activity: "Current month module (M3/M4/M5/M10)", category: "study" },
-  { start: "14:30", end: "14:45", label: "BREAK", activity: "Short break", category: "break" },
-  { start: "14:45", end: "16:15", label: "PRACTICE", activity: "M8/M9 practice papers & questions", category: "study" },
-  { start: "16:15", end: "17:00", label: "REVIEW", activity: "Review mistakes from practice papers", category: "study" },
+  { start: "08:00", end: "10:30", label: "DEEP STUDY", activity: "Current module - READ + WRITE (2.5 hrs focused)", category: "study" },
+  { start: "10:30", end: "10:45", label: "BREAK", activity: "Short break", category: "break" },
+  { start: "10:45", end: "13:00", label: "DEEP STUDY", activity: "Continue current module - practice questions", category: "study" },
+  { start: "13:00", end: "13:30", label: "LUNCH", activity: "Eat prepped meal", category: "lunch" },
+  { start: "13:30", end: "15:30", label: "PRACTICE", activity: "Timed mock papers for current module", category: "study" },
+  { start: "15:30", end: "15:45", label: "BREAK", activity: "Short break", category: "break" },
+  { start: "15:45", end: "17:00", label: "REVIEW", activity: "Review mistakes + weak topics", category: "study" },
   { start: "17:30", end: "18:30", label: "FOUNDER", activity: "Call with co-founder (hard cap at 1 hour)", category: "founder" },
   { start: "18:30", end: "19:30", label: "SAAS", activity: "SaaS development - hour 1", category: "saas" },
   { start: "19:30", end: "22:15", label: "GYM", activity: "Travel (15 min) + Workout (1 hr) + Cardio (30 min) + Travel (15 min)", category: "gym" },
@@ -801,16 +690,16 @@ export function getTodayWorkout(date: Date): WorkoutDay {
 }
 
 /**
- * Study plan start: March 2026.
- * Month 1 (March) = Module 3, Month 2 (April) = Module 4,
- * Month 3 (May) = Modules 5+6. If outside range, returns last module.
+ * Study plan start: April 2026.
+ * Month 1 (April) = Module 6, Month 2 (May) = Module 7A,
+ * Month 3 (June) = Modules 5+10 (M10 via extra classes).
  */
 export function getCurrentStudyModule(date: Date): StudyModule {
   const year = date.getFullYear();
-  const month = date.getMonth(); // 0-indexed: 0=Jan, 2=Mar
+  const month = date.getMonth(); // 0-indexed: 0=Jan, 3=Apr
 
-  // Study month 1 = March 2026 (year=2026, month=2)
-  const studyMonth = (year - 2026) * 12 + (month - 2) + 1; // 1-indexed
+  // Study month 1 = April 2026 (year=2026, month=3)
+  const studyMonth = (year - 2026) * 12 + (month - 3) + 1; // 1-indexed
 
   if (studyMonth <= 0) {
     return STUDY_MODULES[0];
@@ -822,8 +711,7 @@ export function getCurrentStudyModule(date: Date): StudyModule {
     return matched;
   }
 
-  // Month 3 has two modules (5 and 10). For month 3, return module 5 as the primary.
-  // If beyond range, return the last module.
+  // Month 3 has two modules (5 and 10). Return module 5 as the primary.
   if (studyMonth === 3) {
     return STUDY_MODULES[2]; // Module 5
   }
@@ -845,17 +733,17 @@ export function getCurrentStudyWeek(
 
   const mod = getCurrentStudyModule(date);
 
-  // For month 3, modules 5 and 10 share the month.
+  // For month 3 (June), modules 5 and 10 share the month.
   // Module 5 covers weeks 1-2, Module 10 covers weeks 3-4.
   const year = date.getFullYear();
   const month = date.getMonth();
-  const studyMonth = (year - 2026) * 12 + (month - 2) + 1;
+  const studyMonth = (year - 2026) * 12 + (month - 3) + 1;
 
   if (studyMonth === 3) {
     if (weekIndex <= 1) {
       // Weeks 1-2: Module 5
       const module5 = STUDY_MODULES[2];
-      const week = module5.weeks[0]; // "Week 1-2"
+      const week = module5.weeks[weekIndex];
       if (week) {
         return { module: module5, week };
       }

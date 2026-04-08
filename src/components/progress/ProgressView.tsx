@@ -9,11 +9,9 @@ import {
 import {
   getDayNumber,
   getDaysUntilExam,
-  getDaysUntilMayExam,
   getAllDaysSinceStart,
   STUDY_MODULES,
-  RETAKE_MODULES,
-  getRetakePhase,
+  EXAM_INFO,
 } from "../../lib/constants";
 
 // ---------------------------------------------------------------------------
@@ -352,8 +350,6 @@ export function ProgressView() {
   const now = new Date();
   const dayNumber = getDayNumber(now);
   const daysUntilExam = getDaysUntilExam(now);
-  const daysUntilMayExam = getDaysUntilMayExam(now);
-  const retakePhase = getRetakePhase(now);
 
   const todayScore = useMemo(() => {
     return todayChecks.filter((c) => c.completed).length;
@@ -448,7 +444,7 @@ export function ProgressView() {
       </div>
 
       {/* Top Stats Row */}
-      <div className="grid grid-cols-4 gap-2 mb-4">
+      <div className="grid grid-cols-3 gap-2 mb-4">
         <div className="glass-card text-center py-3">
           <p className="font-mono text-xl font-bold text-[#FAD399]">{dayNumber + 1}</p>
           <p className="text-[7px] text-[#FAD399]/40 uppercase tracking-widest mt-1">DAY</p>
@@ -458,12 +454,8 @@ export function ProgressView() {
           <p className="text-[7px] text-[#FAD399]/40 uppercase tracking-widest mt-1">STREAK</p>
         </div>
         <div className="glass-card text-center py-3">
-          <p className="font-mono text-xl font-bold text-[#FAD399]">{daysUntilMayExam}</p>
-          <p className="text-[7px] text-[#FAD399]/40 uppercase tracking-widest mt-1">M8/9</p>
-        </div>
-        <div className="glass-card text-center py-3">
           <p className="font-mono text-xl font-bold text-[#FAD399]">{daysUntilExam}</p>
-          <p className="text-[7px] text-[#FAD399]/40 uppercase tracking-widest mt-1">JUNE</p>
+          <p className="text-[7px] text-[#FAD399]/40 uppercase tracking-widest mt-1">EXAM</p>
         </div>
       </div>
 
@@ -535,39 +527,19 @@ export function ProgressView() {
         <CalendarHeatmap checksByDate={checksByDate} allDays={allDaysSinceStart} />
       </div>
 
-      {/* M8/M9 Retake */}
+      {/* Exam Modules — Session 02 */}
       <div className="glass-card mb-4">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-[10px] text-[#FAD399]/40 uppercase tracking-wider">Retake - May Exam</p>
+          <p className="text-[10px] text-[#FAD399]/40 uppercase tracking-wider">DGCA {EXAM_INFO.session}</p>
           <span className="text-[9px] text-[#FAD399] font-mono border border-[#FAD399]/30 px-2 py-0.5 rounded">
-            {retakePhase.label}
+            {EXAM_INFO.window}
           </span>
         </div>
-        <p className="text-[10px] text-[#FAD399]/50 mb-3">{retakePhase.activity}</p>
-        <div className="space-y-2">
-          {RETAKE_MODULES.map((mod) => (
-            <div key={mod.number} className="flex items-center gap-3 py-1.5">
-              <span className="font-mono text-xs w-7 text-center text-[#FAD399] font-bold">
-                M{mod.number}
-              </span>
-              <div className="flex-1">
-                <p className="text-xs text-[#FAD399]/80">{mod.name}</p>
-                <p className="text-[9px] text-[#FAD399]/30 font-mono">
-                  {mod.topics.length} sections
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* June Modules */}
-      <div className="glass-card mb-4">
-        <p className="text-[10px] text-[#FAD399]/40 uppercase tracking-wider mb-3">June Exam Modules</p>
         <div className="space-y-2">
           {STUDY_MODULES.map((mod) => {
             const isCurrent = mod.number === currentModule.number;
-            const monthLabel = mod.month === 1 ? "March" : mod.month === 2 ? "April" : "May";
+            const monthLabel = mod.month === 1 ? "April" : mod.month === 2 ? "May" : "June";
+            const examInfo = EXAM_INFO.modules.find((e) => e.number === mod.number);
             return (
               <div key={mod.number} className={`flex items-center gap-3 py-1.5 ${isCurrent ? "" : "opacity-40"}`}>
                 <span className={`font-mono text-xs w-7 text-center ${isCurrent ? "text-[#FAD399] font-bold" : "text-[#FAD399]/50"}`}>
@@ -575,7 +547,9 @@ export function ProgressView() {
                 </span>
                 <div className="flex-1">
                   <p className="text-xs text-[#FAD399]/80">{mod.name}</p>
-                  <p className="text-[9px] text-[#FAD399]/30 font-mono">{monthLabel}</p>
+                  <p className="text-[9px] text-[#FAD399]/30 font-mono">
+                    {monthLabel} · {examInfo?.questions}
+                  </p>
                 </div>
                 {isCurrent && (
                   <span className="text-[9px] text-[#FAD399] font-mono border border-[#FAD399]/30 px-2 py-0.5 rounded">NOW</span>
