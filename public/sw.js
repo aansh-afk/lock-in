@@ -1,10 +1,38 @@
-const CACHE_NAME = "wheel-v3";
+const CACHE_NAME = "wheel-v4";
 const STATIC_ASSETS = [
   "/",
   "/index.html",
   "/manifest.json",
+  "/offline.html",
   "/wheel.svg",
+  /* __APP_SHELL_ASSETS__ */
 ];
+
+async function cacheResponse(request, response) {
+  if (!response || response.status !== 200 || response.type === "opaque") {
+    return response;
+  }
+
+  const cache = await caches.open(CACHE_NAME);
+  await cache.put(request, response.clone());
+  return response;
+}
+
+async function cacheUrls(urls) {
+  const cache = await caches.open(CACHE_NAME);
+
+  await Promise.all(
+    urls.map(async (url) => {
+      try {
+        const resolvedUrl = new URL(url, self.location.origin);
+        if (resolvedUrl.origin !== self.location.origin) return;
+        await cache.add(`${resolvedUrl.pathname}${resolvedUrl.search}`);
+      } catch {
+        // Ignore bad URLs from the page.
+      }
+    }),
+  );
+}
 
 // Install: precache the app shell, skip waiting to activate immediately
 self.addEventListener("install", (e) => {
@@ -28,6 +56,30 @@ self.addEventListener("activate", (e) => {
   self.clients.claim();
 });
 
+self.addEventListener("message", (e) => {
+  if (e.data?.type !== "CACHE_URLS" || !Array.isArray(e.data.payload)) {
+    return;
+  }
+
+  e.waitUntil(cacheUrls(e.data.payload));
+});
+
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+
+  e.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      for (const client of clients) {
+        if ("focus" in client) {
+          return client.focus();
+        }
+      }
+
+      return self.clients.openWindow("/");
+    }),
+  );
+});
+
 // Fetch handler: fully offline-capable
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
@@ -42,12 +94,12 @@ self.addEventListener("fetch", (e) => {
   if (e.request.mode === "navigate") {
     e.respondWith(
       fetch(e.request)
-        .then((res) => {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
-          return res;
-        })
-        .catch(() => caches.match(e.request).then((r) => r || caches.match("/")))
+        .then((res) => cacheResponse(e.request, res))
+        .catch(() =>
+          caches.match(e.request).then(
+            (r) => r || caches.match("/") || caches.match("/offline.html"),
+          ),
+        )
     );
     return;
   }
@@ -58,11 +110,7 @@ self.addEventListener("fetch", (e) => {
       caches.match(e.request).then(
         (cached) =>
           cached ||
-          fetch(e.request).then((res) => {
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
-            return res;
-          })
+          fetch(e.request).then((res) => cacheResponse(e.request, res))
       )
     );
     return;
@@ -72,11 +120,7 @@ self.addEventListener("fetch", (e) => {
   e.respondWith(
     caches.match(e.request).then((cached) => {
       const fetching = fetch(e.request)
-        .then((res) => {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
-          return res;
-        })
+        .then((res) => cacheResponse(e.request, res))
         .catch(() => cached);
 
       return cached || fetching;

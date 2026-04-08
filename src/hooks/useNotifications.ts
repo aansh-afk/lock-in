@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SCHEDULE } from "../lib/constants";
 
 /** Convert "HH:MM" to minutes since midnight */
@@ -7,77 +7,123 @@ function timeToMinutes(time: string): number {
   return h * 60 + m;
 }
 
-/** Request notification permission on mount, fire schedule-based reminders */
+async function showReminderNotification(title: string, body?: string) {
+  if (!("Notification" in window) || Notification.permission !== "granted") {
+    return;
+  }
+
+  const options = {
+    body,
+    icon: "/wheel.svg",
+    badge: "/wheel.svg",
+    silent: false,
+    data: { url: "/" },
+  };
+
+  try {
+    if ("serviceWorker" in navigator) {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.showNotification(title, options);
+      return;
+    }
+  } catch {
+    // Fall back to the page-level Notification API when the SW path fails.
+  }
+
+  try {
+    new Notification(title, options);
+  } catch {
+    // Safari/iOS may not support the Notification constructor.
+  }
+}
+
 export function useNotifications() {
   const firedBlocks = useRef<Set<string>>(new Set());
-  const permissionRef = useRef<NotificationPermission>("default");
+  const activeDay = useRef<string>("");
+  const [permission, setPermission] = useState<NotificationPermission>(() =>
+    typeof window !== "undefined" && "Notification" in window
+      ? Notification.permission
+      : ("denied" as NotificationPermission),
+  );
 
-  // Request permission after a short delay on mount
   useEffect(() => {
     if (!("Notification" in window)) return;
 
-    if (Notification.permission === "default") {
-      const timer = setTimeout(() => {
-        Notification.requestPermission().then((perm) => {
-          permissionRef.current = perm;
-        });
-      }, 2000);
-      return () => clearTimeout(timer);
-    } else {
-      permissionRef.current = Notification.permission;
-    }
+    const syncPermission = () => setPermission(Notification.permission);
+
+    syncPermission();
+    window.addEventListener("focus", syncPermission);
+    document.addEventListener("visibilitychange", syncPermission);
+
+    return () => {
+      window.removeEventListener("focus", syncPermission);
+      document.removeEventListener("visibilitychange", syncPermission);
+    };
   }, []);
 
   const notify = useCallback((title: string, body?: string) => {
-    if (!("Notification" in window)) return;
-    if (Notification.permission !== "granted") return;
-    try {
-      new Notification(title, {
-        body,
-        icon: "/wheel.svg",
-        badge: "/wheel.svg",
-        silent: false,
-      });
-    } catch {
-      // Safari/iOS may not support Notification constructor
-    }
+    void showReminderNotification(title, body);
   }, []);
 
-  // Schedule block reminders
   useEffect(() => {
+    if (permission !== "granted") return;
+
     const check = () => {
       const now = new Date();
+      const today = now.toISOString().split("T")[0];
       const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
+      if (activeDay.current !== today) {
+        activeDay.current = today;
+        firedBlocks.current.clear();
+      }
+
       for (const block of SCHEDULE) {
-        if (firedBlocks.current.has(block.start)) continue;
+        const reminderKey = `${today}:${block.start}`;
+
+        if (firedBlocks.current.has(reminderKey)) continue;
 
         const blockMinutes = timeToMinutes(block.start);
         const elapsed = nowMinutes - blockMinutes;
 
-        // Fire if we're within 0-2 minutes past the block start
         if (elapsed >= 0 && elapsed <= 2) {
-          firedBlocks.current.add(block.start);
+          firedBlocks.current.add(reminderKey);
           notify(block.label, block.activity);
         }
       }
     };
 
     check();
-    const interval = setInterval(check, 30_000);
-    return () => clearInterval(interval);
-  }, [notify]);
+    const interval = window.setInterval(check, 30_000);
+    window.addEventListener("focus", check);
+    document.addEventListener("visibilitychange", check);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", check);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [notify, permission]);
+
+  const requestPermission = useCallback(async () => {
+    if (!("Notification" in window)) return "denied" as NotificationPermission;
+
+    const nextPermission = await Notification.requestPermission();
+    setPermission(nextPermission);
+
+    if (nextPermission === "granted") {
+      await showReminderNotification(
+        "Reminders enabled",
+        "The Wheel will alert you while the app is active on this device.",
+      );
+    }
+
+    return nextPermission;
+  }, []);
 
   return {
-    permission:
-      typeof window !== "undefined" && "Notification" in window
-        ? Notification.permission
-        : ("denied" as NotificationPermission),
-    requestPermission: async () => {
-      if (!("Notification" in window)) return "denied" as NotificationPermission;
-      const perm = await Notification.requestPermission();
-      permissionRef.current = perm;
-      return perm;
-    },
+    supported: typeof window !== "undefined" && "Notification" in window,
+    permission,
+    requestPermission,
   };
 }
